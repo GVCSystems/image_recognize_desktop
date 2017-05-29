@@ -196,7 +196,7 @@ public class NewEncoder extends JFrame {
 
 
 
-            SendMail.SendSimpleMessage(bytes);
+            SendMail.SendSimpleMessage(bytes,str);
 
         }
         catch (Exception e)
