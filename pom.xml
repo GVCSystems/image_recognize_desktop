@@ -68,7 +68,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>in.gvc.NewEncoder</mainClass>
+                            <mainClass>in.gvc.Controller</mainClass>
                         </manifest>
                     </archive>
                     <outputDirectory>deployments</outputDirectory>
@@ -113,6 +113,14 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
