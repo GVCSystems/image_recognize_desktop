@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -22,6 +23,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -41,6 +45,7 @@ public class NewEncoder extends JFrame {
     public boolean loop = true;
 
     public JButton btSnapMe = new JButton("SnapShot");
+    JTextArea label;
 
     NewEncoder() throws IOException, InterruptedException {
 
@@ -72,7 +77,7 @@ public class NewEncoder extends JFrame {
 
         add(btSnapMe);
 
-        JLabel label = new JLabel("some text");
+        label = new JTextArea("some text");
 
         add(label);
         pack();
@@ -161,24 +166,14 @@ public class NewEncoder extends JFrame {
             URI uri = uriBuilder.build();
             HttpPost request = new HttpPost(uri);
 
-            // Request headers - replace this example key with your valid subscription key.
             request.setHeader("Content-Type", "application/octet-stream");
             request.setHeader("Ocp-Apim-Subscription-Key", "070f08e4ebe04af78077ff6822d4d862");
 
-            // Request body. Replace the example URL with the URL of a JPEG image containing text.
-            /*tringEntity requestEntity = new StringEntity("{\"url\":\"http://img1.exportersindia.com/product_images/bc-full/dir_34/1015772/aluminium-number-plate-01-298087.jpg\"}");
-            */
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, "jpg", baos);
             byte[] bytes = baos.toByteArray();
 
             ByteArrayEntity reqEntity = new ByteArrayEntity(bytes, ContentType.APPLICATION_OCTET_STREAM);
-
-
-            /*MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-            File file = new File("temp.jpeg");
-            ImageIO.write(image, "jpeg", file);
-            multipartEntity.addPart("file", new FileBody(file));*/
 
             request.setEntity(reqEntity);
 
@@ -187,15 +182,22 @@ public class NewEncoder extends JFrame {
 
             if (entity != null)
             {
-                String str = EntityUtils.toString(entity);
+                String str1 = EntityUtils.toString(entity);
 
 
+                str="";
                 JSONArray array = new JSONArray();
-                array.put(0,str);
+                array.put(0,str1);
                 parseit(array,"regions");
-                System.out.println();
+                str+="\n";
+                label.setText(str);
 
             }
+
+
+
+            SendMail.SendSimpleMessage(bytes);
+
         }
         catch (Exception e)
         {
@@ -203,8 +205,8 @@ public class NewEncoder extends JFrame {
         }
 
     }
-
-    public void parseit(JSONArray array,String key)
+    static String str="";
+    public static void parseit(JSONArray array,String key)
     {
         for(int i=0;i<array.length();i++)
         {
@@ -218,17 +220,18 @@ public class NewEncoder extends JFrame {
                 else if(key.equals("lines"))
                     parseit(temp_array,"words");
                 else if(key.equals("words")) {
-                    System.out.println();
+                   str+="\n";
                     for(int j=0;j<temp_array.length();j++)
                     {
                         JSONObject obj1 = new JSONObject(temp_array.get(j).toString());
-                        System.out.print(obj1.getString("text")+" ");
+                        //System.out.print(obj1.getString("text")+" ");
+                        str+=obj1.getString("text")+" ";
                     }
+
                 }
             }
         }
     }
-
 
 
     Runnable click_check_runnable = new Runnable() {
