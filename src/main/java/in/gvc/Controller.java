@@ -41,7 +41,6 @@ public class Controller {
 
     JButton btSnapMe;
 
-    public boolean loop = true;
     public java.util.List<Webcam> webcamList;
 
     static final NewJFrame newJFrame = new NewJFrame();
@@ -65,10 +64,6 @@ public class Controller {
     public JPanel getCameraPanel()
     {
         return panel;
-    }
-    public JButton getSnapButton()
-    {
-        return btSnapMe;
     }
 
     public static void main(String arg[])
@@ -103,7 +98,7 @@ public class Controller {
                     newJFrame.jComboBox1.addItem(web.getName());
                 }
 
-                controller.webcam = controller.webcamList.get(0);
+                controller.webcam = Webcam.getDefault();
                 controller.webcam.setViewSize(controller.size);
 
                 controller.panel = new WebcamPanel(controller.webcam, controller.size, false);
@@ -136,28 +131,50 @@ public class Controller {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         int index = newJFrame.jComboBox1.getSelectedIndex();
-                        controller.panel = new WebcamPanel(controller.webcamList.get(index), controller.size, false);
+
+                        newJFrame.jPanel1.removeAll();
+                        newJFrame.revalidate();
+                        newJFrame.repaint();
+
+                        controller.panel.stop();
+
+                        controller.webcam.close();
+                        controller.webcam = controller.webcamList.get(index);
+                        controller.webcam.setViewSize(controller.size);
+
+                        controller.panel = new WebcamPanel(controller.webcam, controller.size, false);
                         controller.panel.setFillArea(true);
                         controller.panel.start();
+
+                        newJFrame.jPanel1.add(controller.panel,BorderLayout.CENTER);
+                        newJFrame.revalidate();
+                        newJFrame.repaint();
                     }
                 });
 
                 newJFrame.setVisible(true);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Image image = null;
+                        URL url = null;
+                        try {
+                            url = new URL("https://www.google.com/a/gvc.in/images/logo.gif");
+                            image = ImageIO.read(url);
+                            JLabel background = new JLabel(new ImageIcon(image));
+                            newJFrame.jPanel2.setLayout(new BorderLayout());
+                            newJFrame.jPanel2.add(background,BorderLayout.CENTER);
+                            newJFrame.jPanel2.revalidate();
+                            newJFrame.jPanel2.repaint();
 
-                Image image = null;
-                URL url = null;
-                try {
-                    url = new URL("https://www.google.com/a/gvc.in/images/logo.gif");
-                    image = ImageIO.read(url);
-                    JLabel background = new JLabel(new ImageIcon(image));
-                    newJFrame.jPanel2.setLayout(new BorderLayout());
-                    newJFrame.jPanel2.add(background,BorderLayout.NORTH);
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
 
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         });
     }
