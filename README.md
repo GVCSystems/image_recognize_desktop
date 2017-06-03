@@ -1,4 +1,4 @@
-# Image Recognize Desktop
+# Image Recognize Desktop ![build passing](https://travis-ci.org/GVCSystems/image_recognize_desktop.svg?branch=master)
 This is small application for desktop to recognize text from Image. Webcam or USB camera will be needed to capture Images.
 
 ## Getting Started
